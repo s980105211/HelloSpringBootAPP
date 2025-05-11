@@ -1,4 +1,4 @@
-name: Build and Deploy Spring Boot App
+name: 建置並部署 Spring Boot 應用程式
 
 on:
   push:
@@ -9,35 +9,39 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: 檢出程式碼
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v1
+      - name: List files before chmod
+        run: ls -la  # Add this step to list files
+
+      - name: 設定 JDK 17
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: 'temurin'
 
-      - name: Make Maven Wrapper Executable
-        run: chmod +x mvnw  # 添加這個步驟
+      - name: 使 Maven Wrapper 可執行
+        run: chmod +x mvnw
 
-      - name: Build Spring Boot app
+      - name: 建置 Spring Boot 應用程式
         run: ./mvnw clean package -DskipTests
 
-      - name: Build Docker image
+      - name: 建置 Docker 映像檔
         run: docker build -t ghcr.io/s980105211/my-spring-app:latest .
 
-      - name: Log in to GitHub Container Registry
+      - name: 登入 GitHub Container Registry
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push Docker image to GHCR
+      - name: 將 Docker 映像檔推送到 GHCR
         run: docker push ghcr.io/s980105211/my-spring-app:latest
 
-      - name: Log in to Azure
+      - name: 登入 Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy to Azure Container App
+      - name: 部署到 Azure Container App
         run: |
           az containerapp update \
             --name my-spring-app \
