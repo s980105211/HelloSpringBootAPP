@@ -22,10 +22,10 @@ jobs:
           distribution: 'temurin'
 
       - name: 使 Maven Wrapper 可執行
-        run: chmod +x mvnw
+        run: chmod +x demo/mvnw # 修改此行
 
       - name: 建置 Spring Boot 應用程式
-        run: ./mvnw clean package -DskipTests
+        run: ./demo/mvnw clean package -DskipTests # 修改此行
 
       - name: 建置 Docker 映像檔
         run: docker build -t ghcr.io/s980105211/my-spring-app:latest .
